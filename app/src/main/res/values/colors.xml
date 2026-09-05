@@ -1,0 +1,4 @@
+<resources>
+    <!-- Mirrors FtColor.Background; used by the launch theme only. -->
+    <color name="ft_background">#FF07080B</color>
+</resources>
