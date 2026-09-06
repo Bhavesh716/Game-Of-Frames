@@ -1,8 +1,8 @@
 <div align="center">
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0F172A,100:6D28D9&height=250&section=header&text=GAME%20OF%20FRAMES&fontSize=48&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Every%20frame%20has%20its%20throne.&descAlignY=58&descAlign=50" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0F172A,100:6D28D9&height=250&section=header&text=GAME%20OF%20FRAMES&fontSize=48&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Every%20character%20has%20its%20throne.&descAlignY=58&descAlign=50" width="100%"/>
 
 <p align="center">
-<b>"A collage should not be more work to make than the video was to watch."</b>
+<b>Create beautiful organized shareable image collages from portrait videos with just One click of a button!</b>
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 <br>
@@ -98,6 +98,7 @@ One collage. Every person, once.
 ```
 
 Nothing here is hardcoded to a specific video, and nothing runs off-device.
+
 
 ---
 
@@ -198,6 +199,7 @@ new       = current − last        → starts a new appearance
 ended     = last − current        → closes an appearance
 continued = current ∩ last        → nothing changes
 ```
+
 
 - Two people sharing one frame produce **one appearance each** — never one shared appearance.
 - The same person detected twice in one frame (a detector double-hit) still counts **once**.
@@ -396,28 +398,6 @@ or simply open the project in Android Studio and run the `app` configuration.
 | Kotlin, minSdk 26 | ✅ |
 | ML Kit for detection, on-device embedding model, documented | ✅ MobileFaceNet — see "Identity Intelligence" and `app/src/main/assets/NOTICE_mobilefacenet.md` |
 | Everything on-device, no backend | ✅ No network permission is even declared |
-
----
-
-## 🎥 Test Videos & Demo
-
-Test clips used (as supplied — not bundled into the app or its assets):
-
-[Sample 1](https://drive.google.com/file/d/1TjmQ2tYiQFGRgbQiAYKPX_sDCdPFP1gJ/view) · [Sample 2](https://drive.google.com/file/d/1Tb393FemrCkNYC5Pj3TdeddBgG-az3Hs/view) · [Sample 3](https://drive.google.com/file/d/1WEc-WlyF7dYF9F_tOcOX8HiAILYWH_1L/view) · [Full Drive Folder](https://drive.google.com/drive/folders/1IzlZXv5YIO1-62Dh8NJibfJPCAYGVrzq)
-
-📹 **Demo video** (processing, appearance counts, and the finished collage for each sample): [Watch it here](https://drive.google.com/file/d/1VjfmeBIGMnrp8xvqm72w7DvdRrBEJ2W6/view?usp=sharing)
-
-💻 **Source**: [github.com/Bhavesh716/Game-Of-Frames](https://github.com/Bhavesh716/Game-Of-Frames)
-
----
-
-## 🏆 How This Is Evaluated
-
-| Criterion | Weight | Where it's addressed |
-|---|---|---|
-| Identity grouping & appearance-count accuracy | 50% | "Identity Intelligence" + "Appearance Intelligence" |
-| Code quality & architecture | 30% | "System Architecture" + one-interface-one-implementation, unit-tested pipeline stages |
-| App usability, representative-shot quality, collage presentation | 20% | "Representative Frame Intelligence" + "The Collage Studio" |
 
 ---
 
