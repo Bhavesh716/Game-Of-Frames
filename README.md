@@ -318,66 +318,193 @@ Core design principles:
 ## 📁 Project Structure
 
 ```
-com/instantcollabmaker/
+Game-Of-Frames/
 │
-├── domain/
-│   ├── model/           # Person, Appearance, FrameQuality, CollageLayout, ProcessingState...
-│   ├── processing/      # Pipeline interfaces — free of Android/ML Kit/TFLite types
-│   ├── export/          # CollageExporter / GallerySaver / ShareManager contracts
-│   └── repository/      # AnalysisSession — the current video's in-memory result
-│
-├── data/
-│   ├── video/           # FrameExtractor, VideoMetadataReader — decoding & sampling
-│   ├── detection/       # MlKitFaceDetector
-│   ├── embedding/       # TfLiteFaceEmbedder — the bundled MobileFaceNet model
-│   ├── identity/        # GlobalIdentityMatcher, UnresolvedCandidateTracker
-│   ├── appearance/      # SetDiffAppearanceTracker
-│   ├── quality/         # HeuristicQualityScorer
-│   ├── collage/         # DefaultCollageGenerator, CanvasCollageExporter
-│   ├── pipeline/        # RealVideoProcessor (orchestrator), PersonCropSelector
-│   └── samples/         # SampleVideoProvider — bundled demo clips
-│
-├── ui/
-│   ├── screens/         # Home, Processing, Results, Person Detail, Collage screens, Fullscreen Viewer
-│   ├── components/      # EditableCollageTile, SwapPhotoSheet, ZoomPanState, Collage, Frames...
-│   └── theme/           # Color, type, spacing
-│
-└── navigation/          # AppNavigation, Screen (Navigation Compose routes)
-
-app/src/test/            # JUnit unit tests — no device required
-app/src/main/assets/     # mobilefacenet.tflite + license/provenance notice
+├── app/
+├── gradle/
+├── .gitignore
+├── build.gradle.kts
+├── gradle.properties
+├── gradlew
+├── gradlew.bat
+├── settings.gradle.kts
+├── LICENSE.txt
+└── README.md
 ```
 
 ---
 
-## 🛠️ Build & Setup
+## 🚀 Setup & Installation
 
-No API keys, no `.env`, no additional accounts to create — the embedding model ships inside the repo, and everything runs on-device.
+Game Of Frames is a native Android application built with Kotlin and Gradle.
 
-**Requirements:** Android Studio (or a standalone Android SDK) with `compileSdk 36` installed, matching `local.properties`' `sdk.dir`. minSdk 26 — a physical device or emulator running Android 8.0+.
+The repository includes the Gradle Wrapper, so you do **not** need to install Gradle separately.
 
-**Build a debug APK:**
+### 📋 Prerequisites
+
+Before running the project, make sure you have:
+
+- [Android Studio](https://developer.android.com/studio) installed
+- Android SDK installed through Android Studio
+- Git installed
+- An Android device or Android Emulator
+
+> **Note:** Open the project using the Android Studio project root. Do not open the `app` folder directly.
+
+---
+
+## 📥 1. Clone the Repository
+
+Open a terminal and run:
 
 ```bash
+git clone https://github.com/Bhavesh716/Game-Of-Frames.git
+```
+
+Navigate into the project:
+
+```bash
+cd Game-Of-Frames
+```
+
+The project structure should look similar to:
+
+```
+Game-Of-Frames/
+│
+├── app/
+├── gradle/
+├── .gitignore
+├── build.gradle.kts
+├── gradle.properties
+├── gradlew
+├── gradlew.bat
+├── settings.gradle.kts
+├── LICENSE.txt
+└── README.md
+```
+
+---
+
+## 🛠️ 2. Open in Android Studio
+
+1) Open Android Studio
+2) Select Open
+3) Select the cloned Game-Of-Frames folder
+4) Wait for Android Studio to load the project
+5) Allow Gradle to sync and download the required dependencies
+
+If Gradle Sync does not start automatically, use:
+
+```
+File → Sync Project with Gradle Files
+```
+
+Wait until the synchronization completes successfully.
+
+---
+
+▶️ 3. Run the Application
+
+### Using an Android Emulator
+
+- Open Device Manager in Android Studio
+- Create or select an Android Virtual Device
+- Start the emulator
+- Select the emulator from the device selector
+- Click Run ▶
+  
+### Using a Physical Android Device
+
+- Enable Developer Options on your Android device
+- Enable USB Debugging
+- Connect the device to your computer using USB
+- Accept the USB debugging authorization prompt on the device
+- Select the connected device in Android Studio
+- Click Run ▶
+
+Android Studio will build and install the application automatically.
+
+---
+
+## 📦 4. Build the APK
+
+The application can also be built directly from the terminal using the included Gradle Wrapper.
+
+Windows
+
+From the project root:
+
+```
+.\gradlew.bat assembleDebug
+```
+
+macOS / Linux
+
+```
 ./gradlew assembleDebug
-# → app/build/outputs/apk/debug/app-debug.apk
 ```
 
-**Install & run on a connected device/emulator:**
+After a successful build, the APK will be available at:
 
-```bash
-./gradlew installDebug
+```
+app/build/outputs/apk/debug/app-debug.apk
 ```
 
-or simply open the project in Android Studio and run the `app` configuration.
+You can then transfer this APK to an Android device and install it.
 
-**Run the unit tests** (JVM-only, no device required):
+---
 
-```bash
-./gradlew testDebugUnitTest
+## 📲 5. Install APK Using ADB
+
+If ADB is configured, the generated APK can be installed directly using:
+
+```
+adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-**Using the app:** Home screen → **Choose Video** (pick any portrait clip from the device, or tap one of the bundled sample clips) → watch live processing progress → **Results** → tap a person for their appearance history, or **View Full Collage** for the unique-person collage → pinch-zoom / pan / swap any tile → **Save to Gallery** or **Share**.
+If an older version of Game Of Frames is already installed:
+
+```
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+---
+
+## 🏗️ 6. Build APK Using Android Studio
+
+The APK can also be generated without using the terminal.
+
+In Android Studio:
+
+```
+Build
+    → Generate App Bundles or APKs
+    → Generate APKs
+```
+
+After the build completes, Android Studio will provide an option to locate the generated APK.
+
+The debug APK will be generated under:
+
+```
+app/build/outputs/apk/debug/app-debug.apk
+```
+
+---
+
+## 🎮 7. Using Game Of Frames
+
+After launching the application:
+
+- Select a portrait video from the device.
+- Start the analysis.
+- Wait while Game Of Frames processes the video.
+- The application detects faces and groups appearances belonging to the same person.
+- Review each detected person's best representative frame and appearance count.
+- Tap Create Collage.
+- Review the generated collage.
+- Save the collage to the device gallery or share it using the standard Android share sheet.
 
 ---
 
