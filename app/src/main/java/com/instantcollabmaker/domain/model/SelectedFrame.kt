@@ -8,7 +8,7 @@ data class SelectedFrame(
     val id: String,
     /** Position of this frame within the source video. */
     val timestampMs: Long,
-    /** Index of the sampled frame this came from, useful for debugging Phase 2. */
+    /** Index of the analysis-pass sampled frame this came from, useful for debugging. */
     val frameIndex: Int,
     val image: FrameImage,
     val quality: FrameQuality,

@@ -1,5 +1,6 @@
 package com.instantcollabmaker.ui.components
 
+import android.util.Log
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -9,16 +10,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.lerp
-import com.instantcollabmaker.domain.model.FrameImage
+import com.instantcollabmaker.core.coerceInSafe
 import com.instantcollabmaker.ui.theme.FtColor
 import kotlin.math.max
 import kotlin.math.min
 
 /**
- * Procedural portrait renderer — the Phase 1 stand-in for extracted video frames.
+ * Procedural portrait renderer, used only for the decorative home-screen video poster
+ * (which has no real frame to show before a video is even picked). Real analysis results
+ * always render through [drawFrameImage] instead.
  *
  * Two independent seeds drive the drawing, which is the whole trick:
  *
@@ -514,28 +516,66 @@ private class Rng(seed: Int) {
 // ---------------------------------------------------------------------------------
 
 /**
- * Draws whichever [FrameImage] variant a frame carries.
- *
- * Phase 2 adds a branch here for [FrameImage.Extracted] — decode the cached frame and
- * draw it with the stored generous crop — and every tile in the app inherits real
- * imagery with no further changes.
+ * Draws a decoded real video frame, cover-fitted (scaled so the shorter axis fills the
+ * surface, no distortion) and positioned so [anchor] — the subject's face center within
+ * the source image, normalized 0f..1f — lands as close to the surface's own center as
+ * the source image's bounds allow. This is deliberately *not* a blind image-center crop:
+ * a tile shaped differently than the source crop (e.g. a wide hero slot fed a portrait
+ * crop) would otherwise cut off exactly the part of the image the face lives in.
+ * [image] is `null` while the bitmap is still being decoded off the main thread, or if
+ * decoding failed — an honest empty plate in that case, never a fake portrait.
  */
-fun DrawScope.drawFrameImage(image: FrameImage, accent: Color) {
-    when (image) {
-        is FrameImage.Procedural -> drawProceduralPortrait(
-            seed = image.seed,
-            paletteIndex = image.paletteIndex,
-            accent = accent,
-        )
-
-        is FrameImage.Extracted -> {
-            // Phase 2 territory. Until then, keep the surface deliberately blank rather
-            // than pretending: an empty plate is honest, a fake portrait is not.
-            drawRect(FtColor.SurfaceElevated)
-            drawRect(
-                color = FtColor.Stroke,
-                style = Stroke(width = size.minDimension * 0.006f),
-            )
-        }
+fun DrawScope.drawFrameImage(
+    image: androidx.compose.ui.graphics.ImageBitmap?,
+    accent: Color,
+    anchor: androidx.compose.ui.geometry.Offset = androidx.compose.ui.geometry.Offset(0.5f, 0.5f),
+) {
+    if (image == null) {
+        drawRect(FtColor.SurfaceElevated)
+        return
     }
+    val srcW = image.width.toFloat()
+    val srcH = image.height.toFloat()
+    val dstW = size.width
+    val dstH = size.height
+    // Must never crash regardless of input data: a zero-size decoded bitmap (a corrupt
+    // or truncated cache file) or a zero-size layout (measured before this composable's
+    // real constraints are known) are both real possibilities, not just theoretical ones
+    // — render the same honest empty plate as the null-image case rather than drawing
+    // nothing silently or, worse, dividing by zero below.
+    if (srcW <= 0f || srcH <= 0f) {
+        Log.w(RENDER_SAFETY_TAG, "INVALID_FRAME_RENDER reason=zero_bitmap_size srcW=$srcW srcH=$srcH")
+        drawRect(FtColor.SurfaceElevated)
+        return
+    }
+    if (dstW <= 0f || dstH <= 0f) return
+    val scale = max(dstW / srcW, dstH / srcH)
+    val drawW = srcW * scale
+    val drawH = srcH * scale
+    // Anchor is untrusted input (persisted to disk, could in principle carry a stale/
+    // corrupt NaN if a future writer ever miscalculates it) — never let a non-finite
+    // value reach the arithmetic below.
+    val anchorX = if (anchor.x.isFinite()) anchor.x.coerceIn(0f, 1f) else 0.5f
+    val anchorY = if (anchor.y.isFinite()) anchor.y.coerceIn(0f, 1f) else 0.5f
+    // Where the anchor would land if drawn at its own natural position, then clamped so
+    // the scaled image always still fully covers the destination (no letterboxing) —
+    // the same guarantee a blind center-crop gives, just centered on the face instead of
+    // the raw image when there's room to do so.
+    //
+    // `dstW - drawW` and `dstH - drawH` are *mathematically* guaranteed <= 0 here (drawW/
+    // drawH cover dstW/dstH by construction via `scale`), but float rounding on the
+    // scale multiplication can leave a few ULPs of positive slop — exactly the crash this
+    // guards against ("Cannot coerce value to an empty range: maximum 0.0 is less than
+    // minimum 1.5258789E-5"). coerceInSafe absorbs that instead of throwing.
+    val idealOffsetX = dstW / 2f - anchorX * drawW
+    val idealOffsetY = dstH / 2f - anchorY * drawH
+    val offsetX = idealOffsetX.coerceInSafe(dstW - drawW, 0f)
+    val offsetY = idealOffsetY.coerceInSafe(dstH - drawH, 0f)
+    drawImage(
+        image = image,
+        dstOffset = androidx.compose.ui.unit.IntOffset(offsetX.toInt(), offsetY.toInt()),
+        dstSize = androidx.compose.ui.unit.IntSize(drawW.toInt().coerceAtLeast(1), drawH.toInt().coerceAtLeast(1)),
+    )
 }
+
+private const val RENDER_SAFETY_TAG = "FrameRenderSafety"

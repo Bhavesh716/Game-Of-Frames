@@ -4,7 +4,7 @@
       (ui/theme). windowBackground matches FtColor.Background so a cold start does not
       flash a light frame before the first composition.
     -->
-    <style name="Theme.FrameTrace" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.GameOfFrames" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/ft_background</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:statusBarColor">@android:color/transparent</item>

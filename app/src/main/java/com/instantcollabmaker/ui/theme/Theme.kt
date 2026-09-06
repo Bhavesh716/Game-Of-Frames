@@ -29,12 +29,12 @@ private val FtColorScheme = darkColorScheme(
 )
 
 /**
- * FrameTrace is deliberately a single-mode (dark, cinematic) product, so the system
+ * Game Of Frames is deliberately a single-mode (dark, cinematic) product, so the system
  * dark-mode flag is accepted but does not switch palettes; a light equivalent would
  * undermine the design direction.
  */
 @Composable
-fun FrameTraceTheme(
+fun GameOfFramesTheme(
     @Suppress("UNUSED_PARAMETER") darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {

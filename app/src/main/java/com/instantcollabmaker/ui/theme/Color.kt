@@ -3,11 +3,13 @@ package com.instantcollabmaker.ui.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * FrameTrace palette.
+ * Game Of Frames palette.
  *
- * A single cinematic near-black neutral ramp, warm off-white type, and exactly one
- * champagne accent. Colour variety in the product comes from the per-person filmic
- * accents below, not from the chrome.
+ * A cinematic near-black neutral ramp and warm off-white type stay the quiet base — but
+ * the brand marks (logo, splash, the primary call-to-action) get a real two-color pop:
+ * champagne gold against a vivid teal, with a coral used sparingly as a third spark.
+ * Deliberately confined to those few brand moments rather than smeared across every
+ * surface, so the app reads as "a little colorful, on purpose" rather than busy.
  */
 object FtColor {
     // Neutral ramp
@@ -29,10 +31,13 @@ object FtColor {
     val TextMuted = Color(0xFF6B6F7A)
     val TextOnAccent = Color(0xFF14100A)
 
-    // Accent
+    // Accent — the brand's primary champagne gold, plus two vivid sparks reserved for
+    // the logo mark, splash glow and the one primary call-to-action per screen.
     val Accent = Color(0xFFD9BC83)
     val AccentSoft = Color(0xFF3A3223)
     val AccentDim = Color(0xFF8C7A55)
+    val AccentTeal = Color(0xFF2FD9C4)
+    val AccentCoral = Color(0xFFFF6F91)
 
     // Semantic
     val Success = Color(0xFF7FD1A0)

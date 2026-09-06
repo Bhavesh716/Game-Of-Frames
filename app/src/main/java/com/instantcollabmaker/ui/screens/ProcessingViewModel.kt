@@ -9,6 +9,7 @@ import com.instantcollabmaker.domain.model.ProcessingStats
 import com.instantcollabmaker.domain.model.VideoAnalysisResult
 import com.instantcollabmaker.domain.processing.VideoProcessor
 import com.instantcollabmaker.domain.repository.AnalysisSession
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,8 +23,21 @@ class ProcessingViewModel(
     private val _uiState = MutableStateFlow<ProcessingUiState>(ProcessingUiState.Idle)
     val uiState: StateFlow<ProcessingUiState> = _uiState.asStateFlow()
 
+    private var job: Job? = null
+
+    /**
+     * Cancels the in-flight analysis. The processor's `try/finally` releases the frame
+     * extractor, ML Kit detector and TFLite interpreter as soon as this cancellation
+     * propagates, whichever suspend call it happens to be sitting in.
+     */
+    fun cancel() {
+        job?.cancel()
+        _uiState.value = ProcessingUiState.Idle
+    }
+
     fun processVideo(videoUri: Uri) {
-        viewModelScope.launch {
+        job?.cancel()
+        job = viewModelScope.launch {
             _uiState.value = ProcessingUiState.Running(
                 progress = 0f,
                 stage = ProcessingStage.ReadingVideo,

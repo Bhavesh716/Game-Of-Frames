@@ -72,7 +72,7 @@ object FtType {
     )
 }
 
-/** Material3 typography wired to the FrameTrace scale so stock components inherit it. */
+/** Material3 typography wired to the Game Of Frames scale so stock components inherit it. */
 internal val FtTypography = Typography(
     displayLarge = FtType.displayLarge,
     displayMedium = FtType.displayMedium,

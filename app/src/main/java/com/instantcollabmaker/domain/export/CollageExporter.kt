@@ -4,10 +4,8 @@ import android.graphics.Bitmap
 import com.instantcollabmaker.domain.model.CollageLayout
 
 /**
- * Phase 2 contract for bitmap export.
- *
- * Phase 1 uses a placeholder implementation that immediately returns null, which callers
- * handle by showing a "Feature coming soon" toast. Phase 2 implements the real renderer.
+ * Renders a [CollageLayout] to a real bitmap suitable for saving or sharing. Implemented
+ * by `com.instantcollabmaker.data.collage.CanvasCollageExporter`.
  */
 interface CollageExporter {
     /**

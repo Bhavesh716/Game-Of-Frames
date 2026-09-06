@@ -7,11 +7,13 @@ import kotlinx.coroutines.flow.Flow
 /**
  * The single entry point the UI knows about for turning a video into people.
  *
- * Phase 1 binds this to `MockVideoProcessor`. Phase 2 binds it to a real
- * implementation that drives [FaceDetector], [FaceEmbedder], [IdentityMatcher],
- * [AppearanceTracker] and [QualityScorer] over sampled frames in one pass. Because the
- * contract is a cold `Flow<ProcessingState>`, cancellation and back-pressure already
- * work and no ViewModel or screen needs to change.
+ * Bound to `com.instantcollabmaker.data.pipeline.RealVideoProcessor`, which drives
+ * [FaceDetector], [FaceEmbedder], `com.instantcollabmaker.data.identity.GlobalIdentityMatcher`,
+ * `com.instantcollabmaker.data.appearance.SetDiffAppearanceTracker` and [QualityScorer]
+ * over one deterministic ~4 FPS sampled timeline. Because the contract is
+ * a cold `Flow<ProcessingState>`, cancellation and back-pressure already work for free —
+ * cancelling the collecting coroutine (see `ProcessingViewModel.cancel`) is enough to
+ * unwind the whole pipeline and release its resources.
  */
 interface VideoProcessor {
 

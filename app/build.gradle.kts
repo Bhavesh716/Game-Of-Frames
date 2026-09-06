@@ -36,6 +36,10 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+    androidResources {
+        noCompress += "tflite"
     }
 }
 
@@ -54,7 +58,12 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.mlkit.face.detection)
+    implementation(libs.tensorflow.lite)
+
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

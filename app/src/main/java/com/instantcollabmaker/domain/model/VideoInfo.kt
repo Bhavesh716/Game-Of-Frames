@@ -2,10 +2,7 @@ package com.instantcollabmaker.domain.model
 
 import android.net.Uri
 
-/**
- * Everything the UI needs to describe the input video, independent of how it was
- * obtained (gallery pick, bundled sample, or — in Phase 2 — anything else).
- */
+/** Everything the UI needs to describe the video the user picked. */
 data class VideoInfo(
     val uri: Uri,
     val displayName: String,
@@ -13,8 +10,6 @@ data class VideoInfo(
     val width: Int,
     val height: Int,
     val sizeBytes: Long,
-    /** True when this came from the bundled demo entry rather than the user gallery. */
-    val isSample: Boolean = false,
 ) {
     val hasResolution: Boolean get() = width > 0 && height > 0
     val hasSize: Boolean get() = sizeBytes > 0

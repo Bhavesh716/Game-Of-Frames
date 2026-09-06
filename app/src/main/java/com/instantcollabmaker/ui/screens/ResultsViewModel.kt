@@ -1,7 +1,6 @@
 package com.instantcollabmaker.ui.screens
 
 import androidx.lifecycle.ViewModel
-import com.instantcollabmaker.core.Format
 import com.instantcollabmaker.domain.model.CollageItem
 import com.instantcollabmaker.domain.model.CollageLayout
 import com.instantcollabmaker.domain.model.CollageSpec
@@ -22,6 +21,11 @@ class ResultsViewModel(
         return result.value?.people?.find { it.id == personId }
     }
 
+    /** Renames a person for the rest of this video's session — see [AnalysisSession.renamePerson]. */
+    fun renamePerson(personId: String, newName: String) {
+        session.renamePerson(personId, newName)
+    }
+
     fun generatePersonCollage(personId: String): CollageLayout? {
         val person = getPersonById(personId) ?: return null
 
@@ -29,47 +33,38 @@ class ResultsViewModel(
             CollageItem(
                 id = appearance.id,
                 frame = appearance.bestFrame,
-                label = "Appearance ${appearance.index.toString().padStart(2, '0')}",
-                caption = Format.timeRange(appearance.startTimestampMs, appearance.endTimestampMs),
+                label = "${person.displayName}, appearance ${appearance.index}",
                 accentIndex = person.index,
             )
         }
 
-        val spec = CollageSpec(
-            title = person.displayName,
-            subtitle = Format.count(person.appearanceCount, "appearance"),
-            footerPrimary = "FrameTrace",
-            footerSecondary = "${Format.seconds(person.totalScreenTimeMs)} on screen",
-            items = items,
-        )
-
-        return collageGenerator.layout(spec)
+        return collageGenerator.layout(CollageSpec(items = items))
     }
 
+    /**
+     * The unique-person collage: every person exactly once, never one tile per
+     * appearance — that distinction is the whole point of [generatePersonCollage]
+     * existing separately.
+     *
+     * Items are ordered by appearance count, most first, so a person who appeared far
+     * more often naturally lands in the layout's hero slot — the "slightly more visual
+     * prominence for more appearances" the layout allows for, without ever making one
+     * person's tile dramatically larger than everyone else's.
+     */
     fun generateFullCollage(): CollageLayout? {
         val analysisResult = result.value ?: return null
 
-        val items = analysisResult.people.flatMap { person ->
-            person.appearances.map { appearance ->
+        val items = analysisResult.people
+            .sortedByDescending { it.appearanceCount }
+            .map { person ->
                 CollageItem(
-                    id = appearance.id,
-                    frame = appearance.bestFrame,
+                    id = person.id,
+                    frame = person.representativeFrame,
                     label = person.displayName,
-                    caption = Format.timecode(appearance.bestFrameTimestampMs),
                     accentIndex = person.index,
                 )
             }
-        }
 
-        val spec = CollageSpec(
-            title = "Full Collage",
-            subtitle = "${Format.count(analysisResult.peopleCount, "person", "people")} · " +
-                Format.count(analysisResult.appearanceCount, "appearance"),
-            footerPrimary = "FrameTrace",
-            footerSecondary = Format.clock(analysisResult.video.durationMs),
-            items = items,
-        )
-
-        return collageGenerator.layout(spec)
+        return collageGenerator.layout(CollageSpec(items = items))
     }
 }

@@ -1,5 +1,6 @@
 package com.instantcollabmaker.ui.components
 
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,10 +10,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -21,12 +30,13 @@ import com.instantcollabmaker.domain.model.SelectedFrame
 import com.instantcollabmaker.ui.theme.FtColor
 import com.instantcollabmaker.ui.theme.Radius
 import com.instantcollabmaker.ui.theme.Sizes
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * The one place a selected frame becomes pixels on screen.
  *
- * Every thumbnail, hero image and collage tile in the app goes through here, so when
- * Phase 2 starts producing real extracted frames only [drawFrameImage] changes.
+ * Every thumbnail, hero image and collage tile in the app goes through here.
  *
  * @param scrim adds a bottom-up darkening ramp so captions laid over the image stay
  *   legible without a solid bar.
@@ -59,8 +69,9 @@ fun FrameSurface(
                 }
             ),
     ) {
+        val decoded = rememberDecodedFrame(frame.image.path)
         Canvas(Modifier.fillMaxSize()) {
-            drawFrameImage(frame.image, accent)
+            drawFrameImage(decoded, accent, Offset(frame.image.anchorX, frame.image.anchorY))
         }
         if (scrim) {
             Box(
@@ -151,3 +162,20 @@ fun VideoPosterSurface(
 
 /** Kept explicit so callers do not accidentally reach for a bitmap-scaling default. */
 internal val FrameContentScale: ContentScale = ContentScale.Crop
+
+/**
+ * Decodes a cached frame file off the main thread and remembers the result for as long as
+ * [path] is unchanged. Every tile decodes independently and cheaply — files here are
+ * already generously cropped and capped at [com.instantcollabmaker.data.video.FrameExtractor.EXPORT_MAX_DIMENSION_PX],
+ * never the source video's full resolution.
+ */
+@Composable
+private fun rememberDecodedFrame(path: String): ImageBitmap? {
+    var bitmap by remember(path) { mutableStateOf<ImageBitmap?>(null) }
+    LaunchedEffect(path) {
+        bitmap = withContext(Dispatchers.IO) {
+            runCatching { BitmapFactory.decodeFile(path)?.asImageBitmap() }.getOrNull()
+        }
+    }
+    return bitmap
+}

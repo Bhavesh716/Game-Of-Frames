@@ -64,8 +64,11 @@ fun PrimaryButton(
             .fillMaxWidth()
             .height(Sizes.buttonHeight),
         shape = RoundedCornerShape(Radius.md),
+        // The one deliberately colorful surface outside the logo/splash: gold sliding
+        // into coral, so the single primary action per screen actually reads as an
+        // invitation rather than just another dark rectangle.
         background = Brush.horizontalGradient(
-            listOf(FtColor.Accent, androidx.compose.ui.graphics.lerp(FtColor.Accent, Color.White, 0.14f)),
+            listOf(FtColor.Accent, FtColor.AccentCoral),
         ),
         contentDescription = contentDescription ?: text,
     ) {

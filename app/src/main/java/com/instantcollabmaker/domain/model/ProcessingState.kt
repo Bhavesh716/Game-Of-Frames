@@ -1,8 +1,11 @@
 package com.instantcollabmaker.domain.model
 
 /**
- * The ordered pipeline stages. The processing UI renders this list directly, so adding
- * a real stage in Phase 2 means adding an entry here and nothing else.
+ * The ordered pipeline stages. The processing UI renders this list directly. Detection,
+ * identity matching and appearance tracking actually happen together in one chronological
+ * pass over the video (see `RealVideoProcessor`); their progress windows below subdivide
+ * that single pass for a legible UI rather than representing three literally sequential
+ * passes.
  */
 enum class ProcessingStage(
     val title: String,
@@ -34,11 +37,7 @@ data class ProcessingStats(
     }
 }
 
-/**
- * Everything a [com.instantcollabmaker.domain.processing.VideoProcessor] emits.
- *
- * Phase 2 replaces the producer, not this contract.
- */
+/** Everything a [com.instantcollabmaker.domain.processing.VideoProcessor] emits. */
 sealed interface ProcessingState {
 
     data object Idle : ProcessingState

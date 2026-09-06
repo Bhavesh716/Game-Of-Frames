@@ -4,7 +4,6 @@ import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.OpenableColumns
-import com.instantcollabmaker.data.mock.SampleVideoProvider
 import com.instantcollabmaker.domain.model.VideoInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,9 +11,8 @@ import kotlinx.coroutines.withContext
 /**
  * Reads display name, duration, resolution and size for a picked video.
  *
- * This is metadata only — no frame decoding, no analysis. It exists in Phase 1 because
- * the selected-video screen has to show real facts about the user's real file, and
- * Phase 2's frame sampler will reuse the same duration/resolution values.
+ * Metadata only — no frame decoding, no analysis. [FrameExtractor] reuses the same
+ * duration/resolution values this produces.
  */
 interface VideoMetadataReader {
     suspend fun read(uri: Uri): VideoInfo
@@ -25,8 +23,6 @@ class AndroidVideoMetadataReader(
 ) : VideoMetadataReader {
 
     override suspend fun read(uri: Uri): VideoInfo = withContext(Dispatchers.IO) {
-        if (SampleVideoProvider.isSample(uri)) return@withContext SampleVideoProvider.sample()
-
         val (nameFromProvider, sizeFromProvider) = queryOpenableColumns(uri)
         var durationMs = 0L
         var width = 0

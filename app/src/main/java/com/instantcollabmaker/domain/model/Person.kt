@@ -1,8 +1,9 @@
 package com.instantcollabmaker.domain.model
 
 /**
- * A unique identity discovered in the video. In Phase 2 this is one cluster of face
- * embeddings; the fields below are exactly what clustering + tracking can produce.
+ * A unique identity discovered in the video — one global identity produced by
+ * `GlobalIdentityMatcher` and enriched with the appearances `SetDiffAppearanceTracker`
+ * found for it.
  */
 data class Person(
     val id: String,

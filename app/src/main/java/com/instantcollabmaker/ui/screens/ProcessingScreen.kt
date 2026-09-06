@@ -31,6 +31,7 @@ import com.instantcollabmaker.domain.model.ProcessingStats
 import com.instantcollabmaker.ui.components.FtCard
 import com.instantcollabmaker.ui.components.SectionLabel
 import com.instantcollabmaker.ui.components.StatTile
+import com.instantcollabmaker.ui.components.TertiaryButton
 import com.instantcollabmaker.ui.theme.FtColor
 import com.instantcollabmaker.ui.theme.FtType
 import com.instantcollabmaker.ui.theme.Radius
@@ -41,6 +42,7 @@ fun ProcessingScreen(
     progress: Float,
     stage: ProcessingStage,
     stats: ProcessingStats,
+    onCancel: () -> Unit,
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
@@ -117,7 +119,7 @@ fun ProcessingScreen(
                 )
                 StatTile(
                     value = stats.peopleIdentified.toString(),
-                    label = "People",
+                    label = "Temp IDs",
                 )
                 StatTile(
                     value = stats.appearancesDetected.toString(),
@@ -143,6 +145,14 @@ fun ProcessingScreen(
                 )
             }
         }
+
+        Spacer(Modifier.height(Spacing.xxl))
+
+        TertiaryButton(
+            text = "Cancel",
+            onClick = onCancel,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+        )
 
         Spacer(Modifier.height(Spacing.xxl))
     }

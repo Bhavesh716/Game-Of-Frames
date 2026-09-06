@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * Process-lifetime session store. Sufficient for Phase 1; Phase 2 can back this with
- * disk without changing a single consumer.
+ * Process-lifetime session store: which video is selected and the most recent analysis
+ * result, held in memory for as long as the app process is alive.
  */
 class InMemoryAnalysisSession : AnalysisSession {
 
@@ -36,5 +36,15 @@ class InMemoryAnalysisSession : AnalysisSession {
 
     override fun clearResult() {
         _result.value = null
+    }
+
+    override fun renamePerson(personId: String, newName: String) {
+        val trimmed = newName.trim()
+        if (trimmed.isEmpty()) return
+        val current = _result.value ?: return
+        val updatedPeople = current.people.map { person ->
+            if (person.id == personId) person.copy(displayName = trimmed) else person
+        }
+        _result.value = current.copy(people = updatedPeople)
     }
 }

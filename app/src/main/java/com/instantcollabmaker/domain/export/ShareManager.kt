@@ -14,8 +14,9 @@ import java.io.IOException
 /**
  * Creates share intents for bitmaps via FileProvider.
  *
- * Phase 1 exports to cache and shares via ACTION_SEND. The FileProvider authority
- * must be declared in AndroidManifest.xml with a matching file_paths.xml.
+ * Exports to cache and shares via `ACTION_SEND` with a `content://` URI (never
+ * `file://`) and read-URI-permission granted to the receiving app. The FileProvider
+ * authority is declared in AndroidManifest.xml with a matching `file_paths.xml`.
  */
 class ShareManager(private val context: Context) {
 
