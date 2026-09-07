@@ -266,6 +266,68 @@ Face detection, face embedding, identity matching and appearance tracking all ru
 
 ---
 
+## ⚠️ Current Limitation & Future Improvement
+
+Game Of Frames currently has a known limitation when processing frames containing **multiple faces simultaneously**. While the face detection and identity-matching pipeline works reliably for most single-face and typical multi-face scenarios, the on-device recognition model can occasionally produce inconsistent identity matches when several faces are present in the same frame. This can affect identity grouping and, consequently, appearance counts in a small number of cases.
+
+This limitation is primarily a result of the **restricted submission timeline**. Given the limited development window, I prioritized building and integrating the complete end-to-end pipeline — video processing, face detection, face embeddings, identity matching, appearance tracking, representative-frame selection, collage generation, saving, and sharing — rather than leaving the core product incomplete while pursuing a more extensive multi-face recognition refinement.
+
+### 🔧 How I Would Improve It
+
+With additional development time, I would address this by introducing a dedicated **multi-face branching stage** before identity matching.
+
+Instead of passing a multi-face frame directly through the same recognition flow, the pipeline would:
+
+```text
+Multi-Face Frame
+       ↓
+Detect N Faces
+       ↓
+Create N Person-Specific Crops
+       ↓
+Slightly Expand / Zoom Out Each Crop
+       ↓
+Exclude Other Detected Faces Where Possible
+       ↓
+Process Each Crop Independently
+       ↓
+Face Alignment → Embedding → Identity Matching
+       ↓
+Store Each Result Independently
+       ↓
+Update Appearance Tracking
+```
+
+For example, if a frame contains two people:
+
+```
+Original Frame
+┌─────────────────────────────┐
+│       Person A   Person B   │
+└─────────────────────────────┘
+              ↓
+       ┌───────────────┐
+       │               │
+       ▼               ▼
+   Person A Crop   Person B Crop
+       │               │
+       ▼               ▼
+   Embedding A     Embedding B
+       │               │
+       ▼               ▼
+   Identity A      Identity B
+```
+
+Each person would therefore be treated as an independent single-face recognition input, while still retaining the original frame and timestamp for representative-shot reconstruction.
+
+The crop would also be slightly more generous than the face bounding box so that the model receives enough facial context, while being carefully constrained to minimize pixels belonging to neighboring people.
+
+This approach would preserve the existing identity-matching and appearance-tracking architecture while making multi-person frames much more robust and deterministic.
+
+This is a known, bounded limitation rather than a hard architectural limitation. The core pipeline is already designed around independent face observations, so the proposed improvement would primarily strengthen the multi-face preprocessing and recognition stage.
+
+---
+
 ## 🏗 Tech Stack
 
 | Layer | Technology |
