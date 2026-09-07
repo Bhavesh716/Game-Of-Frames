@@ -144,7 +144,9 @@ Below threshold  → new person, IF the face is trustworthy enough (see below)
 
 A poor-quality face (small, edge-clipped, blurry) can still be *matched* to someone already known — continuity should never require a perfect look every time — but it can never single-handedly create a brand-new identity. And a person who is only ever seen at poor quality (a side profile drifting at the edge of frame, say) isn't simply discarded either: their evidence quietly accumulates across frames, and only once several independent, mutually-consistent sightings agree does the app confirm them as a real person — checked once more against everyone already known first, so the same evidence can never create a duplicate.
 
-### 🧩 The Embedding Model
+---
+
+## 🧩 The Embedding Model
 
 **Model:** MobileFaceNet, trained by [`sirius-ai/MobileFaceNet_TF`](https://github.com/sirius-ai/MobileFaceNet_TF) — a TensorFlow implementation of *MobileFaceNets: Efficient CNNs for Accurate Real-Time Face Verification on Mobile Devices* (Chen et al., arXiv:1804.07573). Apache License 2.0. Reported accuracy: 99.4%+ on LFW.
 
@@ -168,7 +170,9 @@ No quantization — a plain float32 model, ~5.2 MB on disk, packaged uncompresse
 
 One `Interpreter` instance is created once per analysis run and reused for every face in the video, `close()`d in a `finally` block whether the run finishes normally, fails, or is cancelled.
 
-### 🎯 The Similarity Threshold — How 0.52 Was Chosen
+---
+
+## 🎯 The Similarity Threshold — How 0.52 Was Chosen
 
 `IDENTITY_MATCH_THRESHOLD` is a single named constant (`GlobalIdentityMatcher`) — nothing else in the pipeline hardcodes a similarity number.
 
@@ -268,9 +272,12 @@ Face detection, face embedding, identity matching and appearance tracking all ru
 
 ## ⚠️ Current Limitation & Future Improvement
 
-Game Of Frames currently has a known limitation when processing frames containing **multiple faces simultaneously**. While the face detection and identity-matching pipeline works reliably for most single-face and typical multi-face scenarios, the on-device recognition model can occasionally produce inconsistent identity matches when several faces are present in the same frame. This can affect identity grouping and, consequently, appearance counts in a small number of cases.
+Game Of Frames currently has a known limitation when processing frames containing **multiple faces simultaneously**. 
 
-This limitation is primarily a result of the **restricted submission timeline**. Given the limited development window, I prioritized building and integrating the complete end-to-end pipeline — video processing, face detection, face embeddings, identity matching, appearance tracking, representative-frame selection, collage generation, saving, and sharing — rather than leaving the core product incomplete while pursuing a more extensive multi-face recognition refinement.
+While the face detection and identity-matching pipeline works reliably for most single-face and typical multi-face scenarios, the on-device recognition model can occasionally produce inconsistent identity matches when several faces are present in the same frame. This can affect identity grouping and, consequently, appearance counts in a small number of cases.
+
+This limitation is primarily a result of the **restricted submission timeline**. <br/>
+Given the limited development window, I prioritized building and integrating the complete end-to-end pipeline — video processing, face detection, face embeddings, identity matching, appearance tracking, representative-frame selection, collage generation, saving, and sharing — rather than leaving the core product incomplete while pursuing a more extensive multi-face recognition refinement.
 
 ### 🔧 How I Would Improve It
 
